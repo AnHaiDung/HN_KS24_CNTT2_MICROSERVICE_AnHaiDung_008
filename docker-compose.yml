@@ -1,0 +1,70 @@
+services:
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka-2
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+
+
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
+
+
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+  redis:
+    image: redis:latest
+    container_name: redis-2
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass "your_secure_password"
+
+
+  organizer-db:
+    image: mysql:8.4
+    container_name: organizer-db
+    restart: unless-stopped
+
+    ports:
+      - "3307:3306"
+
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234$
+      MYSQL_DATABASE: organizer-db
+
+    volumes:
+      - organizer-db-data:/var/lib/mysql
+
+  events-db:
+    image: mysql:8.4
+    container_name: events-db
+    restart: unless-stopped
+
+    ports:
+      - "3308:3306"
+
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234$
+      MYSQL_DATABASE: events-db
+
+    volumes:
+      - events-db-data:/var/lib/mysql
+
+
+volumes:
+  organizer-db-data:
+  events-db-data:
